@@ -1,36 +1,30 @@
 from neuralprophet import NeuralProphet
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib as mpl
+import yfinance as yf
+import plotly.express as px
 import argparse
-
-mpl.rcParams['figure.dpi'] = 150
-savefig_options = dict(format="png", bbox_inches="tight")
+import os
 
 parser = argparse.ArgumentParser("main.py")
-parser.add_argument("url", help="Yahoo finance CSV download url", type=str)
+parser.add_argument("ticker", help="Ticker", type=str)
 args = parser.parse_args()
 
-df = pd.read_csv(args.url).rename({'Date': 'ds', 'Adj Close': 'y'}, axis=1)
-df = df.drop('Open', axis=1)
-df = df.drop('High', axis=1)
-df = df.drop('Low', axis=1)
-df = df.drop('Close', axis=1)
-df = df.drop('Volume', axis=1)
-df = df.drop(len(df) - 1, axis=0)
+df = yf.download(args.ticker, period='max', interval='1d')
+df.to_csv('export/data.csv')
+df = pd.read_csv('export/data.csv').rename({'Date': 'ds', 'Adj Close': 'y'}, axis=1)
+dfSlim = df.drop('Open', axis=1)
+dfSlim = dfSlim.drop('High', axis=1)
+dfSlim = dfSlim.drop('Low', axis=1)
+dfSlim = dfSlim.drop('Close', axis=1)
+dfSlim = dfSlim.drop('Volume', axis=1)
 
-model = NeuralProphet(epochs=500)
-metrics = model.fit(df, freq="MS")
-future = model.make_future_dataframe(df, periods=12, n_historic_predictions=len(df))
+model = NeuralProphet(daily_seasonality=True, yearly_seasonality=True, weekly_seasonality=True, epochs=500)
+metrics = model.fit(dfSlim, freq="D")
+future = model.make_future_dataframe(dfSlim, periods=365, n_historic_predictions=len(dfSlim))
 forecast = model.predict(future)
 
-fig, ax = plt.subplots(figsize=(14, 10))
-model.plot(forecast, xlabel="Date", ylabel="Close", ax=ax)
-ax.xaxis.label.set_size(28)
-ax.yaxis.label.set_size(28)
-ax.tick_params(axis='both', which='major', labelsize=24)
-ax.set_title("1Y Price prediction", fontsize=28, fontweight="bold")
+fig = px.line(x=forecast['ds'], y=forecast['yhat1'])
+fig.add_candlestick(x=forecast['ds'], open=df['Open'], close=df['y'], high=df['High'], low=df['Low'])
 
-fig.savefig("images/forecast.png", **savefig_options)
-# fig_param = model.plot_parameters()
-# fig_param.savefig("params.png", **savefig_options)
+fig.write_json('export/data.json')
+os.remove('export/data.csv')
