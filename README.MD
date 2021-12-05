@@ -1,11 +1,18 @@
 #Neural Prophet Yahoo Finance Implementation
 
+##Requirements
+```shell
+npm install -g http-server
+pip install -r requirements.txt
+```
+
 ##Usage
 ```shell
-python3 main.py {url}
+http-server -o --cors -p 3000
+python3 main.py {ticker}
 ```
 
 ##Example
 ```shell
-python3 main.py "https://query1.finance.yahoo.com/v7/finance/download/1810.HK?period1=1531094400&period2=1638662400&interval=1mo&events=history&includeAdjustedClose=true"
+python3 main.py TSLA
 ```
