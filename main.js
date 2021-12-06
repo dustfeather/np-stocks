@@ -29,18 +29,15 @@ $(window).on('load', function () {
                 borderColor: '#485c7b',
             }
         });
-        const lineSeries = chart.addLineSeries({
-            title: 'Predicted'
-        });
+        const lineSeries = chart.addLineSeries();
         lineSeries.setData(data.lineData);
         const candleSeries = chart.addCandlestickSeries({
-            title: 'Close',
             upColor: '#4bffb5',
             downColor: '#ff4976',
             borderDownColor: '#ff4976',
             borderUpColor: '#4bffb5',
-            wickDownColor: '#838ca1',
-            wickUpColor: '#838ca1',
+            wickDownColor: '#ff4976',
+            wickUpColor: '#4bffb5',
         });
         candleSeries.setData(data.candleData);
     }
