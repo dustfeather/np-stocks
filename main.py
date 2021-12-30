@@ -17,8 +17,9 @@ dfSlim = dfSlim.drop('High', axis=1)
 dfSlim = dfSlim.drop('Low', axis=1)
 dfSlim = dfSlim.drop('Close', axis=1)
 dfSlim = dfSlim.drop('Volume', axis=1)
+dfSlim = dfSlim[:-1]
 
-model = NeuralProphet(train_speed=0)
+model = NeuralProphet(train_speed=-3)
 metrics = model.fit(dfSlim, freq="W")
 future = model.make_future_dataframe(dfSlim, periods=52, n_historic_predictions=len(dfSlim))
 forecast = model.predict(future)
