@@ -21,6 +21,8 @@ dfSlim = dfSlim[:-1]
 
 model = NeuralProphet(train_speed=-3)
 metrics = model.fit(dfSlim, freq="W")
+# Export trained model to file
+# https://joblib.readthedocs.io/en/latest/generated/joblib.dump.html
 future = model.make_future_dataframe(dfSlim, periods=52, n_historic_predictions=len(dfSlim))
 forecast = model.predict(future)
 
